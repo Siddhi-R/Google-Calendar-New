@@ -145,21 +145,20 @@ export default function EventModal() {
     setEditSuccessOpen
   } = useContext(GlobalContext);
 
-  let serviceValFiltered = [];
+  console.log('doctors name :', doctorsName, doctorSelected, docSlotService, selectedSlotArrIndex)
+
+  let serviceValFiltered = '';
 
   if(selectedSlotArrIndex !== null){
-    serviceValFiltered = docSlotService[selectedSlotArrIndex].map(item => {
-      if(item && item.name){
-        return item.name;
-      }
-    })
+    serviceValFiltered = docSlotService[selectedSlotArrIndex]
   }
   
 
   //console.log('serviceValFiltered:', serviceValFiltered)
   const [customer, setCustomer] = useState([]);
   const [workspaceList, setWorkspaceList] = useState([]);
-  const customerValSelected = selectedSlotArrIndex !== null ? `${docSlotUserName[selectedSlotArrIndex]} (${docSlotUserMobile[selectedSlotArrIndex]})` : '';
+  const customerValSelected = selectedSlotArrIndex !== null ? docSlotUserName[selectedSlotArrIndex] : '';
+  const customerPhoneSelected = selectedSlotArrIndex !== null ? docSlotUserMobile[selectedSlotArrIndex] : '';
   // const workspaceNameFiltered = workspaceList && workspaceList.filter(item => {
   //   if(item.id === docSlotWorkspace[selectedSlotArrIndex]){
   //     return item.name;
@@ -172,8 +171,9 @@ export default function EventModal() {
   const endTimeSelected = selectedSlotArrIndex !== null ? docEndTime[selectedSlotArrIndex] : timeZone[timeSelected].end_time;
   const titleSelected = selectedSlotArrIndex !== null ? docSlotDetails[selectedSlotArrIndex] :'';
   const dateSelected = selectedSlotArrIndex !== null ? docDate[selectedSlotArrIndex] : daySelected.format('YYYY-MM-DD');
-  const serviceSelected = selectedSlotArrIndex !== null ? serviceValFiltered :[];
+  const serviceSelected = selectedSlotArrIndex !== null ? docSlotService[selectedSlotArrIndex] : '';
   const [customerValue, setCustomerValue] = React.useState(customerValSelected);
+  const [customerPhone, setCustomerPhone] = React.useState(customerPhoneSelected);
   const [serviceValue, setServiceValue] = React.useState(serviceSelected);
   const [workspaceValue, setWorkspaceValue] = React.useState(workspaceValueSelected);
   const [startTime, setStartTime] = React.useState(startTimeSelected);
@@ -187,15 +187,13 @@ export default function EventModal() {
   const [workspaceInputValue, setWorkspaceInputValue] = React.useState(workspaceValueSelected);
   const [customerInputValue, setCustomerInputValue] = React.useState(customerValSelected);
   const [workspaceAutomcomplete, setWorkspaceAutocomplete] = useState([]);
+  const [inputValue, setInputValue] = React.useState('');
 
   // console.log('clinicSelectedName:', clinicSelectedName, workspaceValue, docSlotWorkspace[selectedSlotArrIndex], docSlotWorkspace, workspaceList, workspaceValueSelected)
 
   useEffect(() => {
-    getWorkspaceList();
-  }, []);
-
-  useEffect(() => {
-    getServicesList(doctorSelected);
+    getServicesList();
+    getDoctorsBookings(doctorSelected);
   }, [doctorSelected]);
 
   function getCustomerList(input){
@@ -226,63 +224,41 @@ export default function EventModal() {
       return false;
     }
 
-    const userMobile = customerValue.split('(')[1].split(')')[0];
-    const userName = customerValue.split('(')[0];
-
-    const workspaceObj = workspaceList.filter(item => item.name === workspaceValue);
-   // console.log('workspaceObj:', workspaceObj);
-
-    const staffObj = doctorsList.filter(item => item.id === doctorSelected);
-
-  //  console.log('staffObj:', staffObj)
-
-    const serviceObj = serviceList.filter(item => {
-      for(let i=0;i<serviceValue.length;i++){
-        if(item.name === serviceValue[i]){
-          return item;
-        }
-      }
-    });
-   // console.log('serviceObj:', serviceObj, serviceValue);
-
-    const slotBookDataNew = {
+    const slotBookDataNew = {"data" : {
         "date": date,
-        "staff_id": doctorSelected,
+        "assigned_staff": doctorSelected,
         "start_time": startTime,
         "end_time": endTime,
-        "user_name": userName,
-        "user_mobile": userMobile,
-        "description": title,
-        "workspace_id": workspaceValue,
-        "service_ids": serviceValue,
-        "workspace_obj": workspaceObj,
-        "staff_obj": staffObj,
-        "service_obj": serviceObj
-    };
+        "customer_name": customerValue,
+        "customer_phone": customerPhone,
+        "notes": title,
+        "clinic_name": workspaceValue,
+        "service": serviceValue,
+    }}; 
 
-    //console.log('create booking new obj :', slotBookDataNew)
+    console.log('create booking new obj :', slotBookDataNew)
 
-    fetch(`https://booking.vetic.in/booking-internal/create?staff_id=${doctorSelected}`, {
-      method: "POST",
-      headers: {"Content-type": "application/json; charset=UTF-8"},
-      body: JSON.stringify(slotBookDataNew),
-    })
-    .then(results => results.json())
-    .then(data => {
-      setDocSlotUserMobile([...docSlotUserMobile, data.data.user_mobile])
-      setDocSlotIDs([...docSlotIDs, data.data.id])
-      setDocDate([...docDate, date])
-      setDocStartTime([...docStartTime, startTime])
-      setDocEndTime([...docEndTime, endTime])
-      setDocSlotDetails([...docSlotDetails, title])
-      setDocSlotUserName([...docSlotUserName, customerValue.split(' ')[0]])
-      setDocSlotWorkspace([...docSlotWorkspace, workspaceValue]);
-      setDocSlotService([...docSlotService, serviceObj]);
-      setShowEventModal(false);
-     // console.log('event modal docSlotService:', docSlotService );
-      setCreateSuccessOpen(true);
-      setTimeout(()=> setCreateSuccessOpen(false), 1000)
-    });
+   fetch(`http://localhost:1337/api/doctor-appointments`, {
+     method: "POST",
+     headers: {"Content-type": "application/json; charset=UTF-8"},
+     body: JSON.stringify(slotBookDataNew),
+   })
+   .then(results => results.json())
+   .then(data => {
+     setDocSlotUserMobile([...docSlotUserMobile, customerPhone])
+     setDocSlotIDs([...docSlotIDs, data.data.id])
+     setDocDate([...docDate, date])
+     setDocStartTime([...docStartTime, startTime])
+     setDocEndTime([...docEndTime, endTime])
+     setDocSlotDetails([...docSlotDetails, title])
+     setDocSlotUserName([...docSlotUserName, customerValue])
+     setDocSlotWorkspace([...docSlotWorkspace, workspaceValue]);
+     setDocSlotService([...docSlotService, serviceValue]);
+     setShowEventModal(false);
+  //  console.log('event modal docSlotService:', docSlotService );
+     setCreateSuccessOpen(true);
+     setTimeout(()=> setCreateSuccessOpen(false), 1000)
+   });
   };
 
   function editBooking(){
@@ -380,32 +356,30 @@ export default function EventModal() {
     });
   }
 
-  function getServicesList(staff_id){
-    fetch(`https://org.vetic.in/clinic-org/service/list?staff_id=${staff_id}`, {
+  function getServicesList(){
+    fetch(`http://localhost:1337/api/services-lists`, {
       method: "GET",
       headers: {"Content-type": "application/json; charset=UTF-8"}
     })
     .then(results => results.json())
     .then(data => {
-      setServiceList(data.data.results)
-    //  console.log('service list fetched:', data.data.results)
+      const serviceListArray = [];
+      data.data.map(item => serviceListArray.push({label: item.attributes.service_name, id: item.id}));
+      setServiceList(serviceListArray)
     });
   }
-  
-  function getWorkspaceList(){
-    fetch(`https://org.vetic.in/clinic-org/workspace/list`, {
+
+  function getDoctorsBookings(doctorSelected){
+    fetch(`http://localhost:1337/api/doctors-list-clinic-wises/${doctorSelected}?populate=*`, {
       method: "GET",
       headers: {"Content-type": "application/json; charset=UTF-8"}
     })
     .then(results => results.json())
     .then(data => {
-      setWorkspaceList(data.data.results); 
-      const workspaceListArray = [];
-      data.data.results.map(item => workspaceListArray.push({label: item.name, id: item.id}));
-      setWorkspaceAutocomplete(workspaceListArray);
-    //  console.log('workspace list fetched:', data.data.results)
+      console.log('get doctors bookings :', doctorSelected, data)
     });
   }
+
 
   const onAppointmentClick = (e) => {
     e.stopPropagation();
@@ -437,19 +411,14 @@ export default function EventModal() {
     );
   };
 
-  const handleWorkspaceChange = (event) => {
-  //  console.log('handleWorkspaceChange event:', event.target.value)
-    setWorkspaceValue(event.target.value);
-    getServicesList(event.target.value);
-
-  };
-
   const handleStartTimeChange= (event) => {
     setStartTime(event.target.value);
+    console.log('start_time:', event.target.value)
   };
 
   const handleEndTimeChange= (event) => {
     setEndTime(event.target.value);
+    console.log('end_time:', event.target.value)
   };
 
   const onEditClick = (e) => {
@@ -472,16 +441,6 @@ export default function EventModal() {
     deleteBooking();
   }
 
-  // const action = (
-  //   <React.Fragment>
-  //     <button onClick={handleClose}>
-  //       <span className="material-icons-outlined text-gray-400">
-  //         close
-  //       </span>
-  //     </button>
-  //   </React.Fragment>
-  // );
-
   return (
     <DivWrapper className="h-screen w-full fixed left-20 top-0 flex justify-center items-center">
       <FormWrapper className="bg-white rounded-lg shadow-2xl w-1/4">
@@ -503,29 +462,17 @@ export default function EventModal() {
             <span className="text-gray-600 font-medium">
               Workspace
             </span>
-             {/* <select value={workspaceValue} onChange={handleWorkspaceChange}>
-              <option value=''>Select a Workspace</option>
-              {workspaceList.map((option,id) => (
-                <option key={id} value={option.id} onClick={() => {
-                  console.log('workspaceId on click:', option.id)
-                  setWorkspaceId(option.id);
-                }}>{option.name}</option>
-              ))}
-            </select> */}
             <Autocomplete disabled
               value={workspaceValue}
               onChange={(event, newValue) => {
                 event.stopPropagation();
                 event.preventDefault();
-              //  console.log('onChange:', newValue, newValue.label, newValue.id)
                 setWorkspaceValue(newValue.label);
-                // setDropdownId(newValue.id);
                 setWorkspaceId(newValue.id);
               }}
               inputValue={workspaceInputValue}
               onInputChange={(event, newInputValue) => {
                 event.preventDefault();
-               // console.log('onInputChange:', newInputValue)
                 setWorkspaceInputValue(newInputValue);
               }}
               id="controllable-states-demo"
@@ -535,16 +482,25 @@ export default function EventModal() {
              <span className="text-gray-600 font-medium">
               Service
             </span>
-             {/* <select value={serviceValue} onChange={handleServiceChange}>
-              {service.map((option,id) => (
-                <option key={id} value={option.name}>{option.name}</option>
-              ))}
-            </select> */}
-            <FormControl>
+
+            <Autocomplete
+              value={serviceValue}
+              onChange={(event, newValue) => {
+                setServiceValue(newValue.label)
+              }}
+              inputValue={inputValue}
+              onInputChange={(event, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              id="controllable-states-demo"
+              options={serviceList}
+              renderInput={(params) => <TextField {...params} label="Select Service" />}
+            />
+
+            {/* <FormControl>
               <Select
                 labelId="demo-multiple-checkbox-label"
                 id="demo-multiple-checkbox"
-                multiple
                 value={serviceValue}
                 input={<OutlinedInput />}
                 onChange={handleServiceChange}
@@ -552,7 +508,7 @@ export default function EventModal() {
                   if (selected.length === 0) {
                     return <em>Select a Service</em>;
                   }
-                  return selected.join(', ');
+                  return selected;
                 }}
                 MenuProps={MenuProps}
               >
@@ -560,13 +516,13 @@ export default function EventModal() {
                   <em>Select a Service</em>
                 </MenuItem>
                 {serviceList.map((service) => (
-                  <MenuItem key={service.name} value={service.name}>
-                    <Checkbox checked={serviceValue.indexOf(service.name) > -1} />
-                    <ListItemText primary={service.name} />
+                  <MenuItem key={service.attributes.service_name} value={service.attributes.service_name}>
+                    <Checkbox checked={serviceValue.indexOf(service.attributes.service_name) > -1} />
+                    <ListItemText primary={service.attributes.service_name} />
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
              <span className="text-gray-600 font-medium">
               Assigned Staff
             </span>
@@ -590,6 +546,7 @@ export default function EventModal() {
               className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500" 
               onChange={(e) => {
                 setDate(e.target.value)
+                console.log('setDate:', e.target.value)
               }}
             />
              <span className="text-gray-600 font-medium">
@@ -609,14 +566,26 @@ export default function EventModal() {
               ))}
             </SelectWrapper>
              <span className="text-gray-600 font-medium">
-              Customer
+              Customer Name
             </span>
-            {/* <select value={customerValue} onChange={handleCustomerChange}>
-              {customer && customer.map((option, id) => (
-                <option key={id}  value={option.name}>{option.name} ({option.mobile})</option>
-              ))}
-            </select> */}
-             <Autocomplete
+            <input
+              type="text"
+              name="customerName"
+              value={customerValue}
+              className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
+              onChange={(e) => {setCustomerValue(e.target.value)}}
+            />
+            <span className="text-gray-600 font-medium">
+              Customer Phone Number
+            </span>
+            <input
+              type="text"
+              name="customerPhone"
+              value={customerPhone}
+              className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
+              onChange={(e) => {setCustomerPhone(e.target.value)}}
+            />
+             {/* <Autocomplete
               value={customerValue}
               onChange={(event, newValue) => {
                 event.stopPropagation();
@@ -640,7 +609,7 @@ export default function EventModal() {
               id="controllable-states-demo"
               options={customer}
               renderInput={(params) => <TextField {...params} label="Customer" />}
-            />
+            /> */}
              <SpanWrapper className="text-gray-600 font-medium">
               Notes
             </SpanWrapper>

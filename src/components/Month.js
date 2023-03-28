@@ -49,13 +49,14 @@ export default function Month({ month }) {
     if(clinicSelected !== undefined){
      // console.log('clinic Selected:', clinicSelected)
       setShowLoading(true)
-      fetch(`https://org.vetic.in/clinic-org/staff/list?workspace_id=${clinicSelected}`, {
+      fetch(`http://localhost:1337/api/clinics-lists/${clinicSelected}?populate=*`, {
           method: "GET",
           headers: {"Content-type": "application/json; charset=UTF-8"}
         })
         .then(results => results.json())
         .then(data => {
-          setDoctorsList(data.data);
+          console.log('setDoctorsList:', data.data.attributes.doctors_data.data)
+          setDoctorsList(data.data.attributes.doctors_data.data);
           setShowLoading(false)
         });
     }
@@ -73,11 +74,12 @@ export default function Month({ month }) {
         <div className="grid-rows-2">
           <BoxWrapper> 
               <Tabs aria-label="basic tabs example">
-                {doctorsList.map(({name, id}, index) => (
-                   <TabWrapper key={index} value={index} label={name} {...a11yProps(index)} tabId={index} activeTab={activeTab} onClick={() => {
+                {doctorsList.map((item, index) => (
+                   <TabWrapper key={index} value={index} label={item.attributes.doctor_name} {...a11yProps(index)} tabId={index} activeTab={activeTab} onClick={() => {
                       setActiveTab(index);
-                      setDoctorSelected(id);
-                      setDoctorsName(name);
+                      setDoctorSelected(item.id);
+                      console.log('doctor selected:', item.id)
+                      setDoctorsName(item.attributes.doctor_name);
                       setShowSlotBook(true);
                     }}
                     />
