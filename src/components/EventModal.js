@@ -271,7 +271,7 @@ export default function EventModal() {
         "end_time": endTime,
         "customer_name": customerValue,
         "customer_phone": customerPhone,
-        "description": title,
+        "notes": title,
         "clinic_name": workspaceValue,
         "service": serviceValue
     }};
