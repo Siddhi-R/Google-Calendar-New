@@ -22,7 +22,7 @@ const AlertNew = React.forwardRef(function Alert(
 });
 
 function App() {
-  const { setWeekIndex, showEventModal, snackbarOpen, showLoading, setWeekIndexNew, setDaysMatrix, weekIndexNew, currentMonth, setCurrentMonth, createSuccessOpen, setCreateSuccessOpen, editSuccessOpen, setEditSuccessOpen } = useContext(GlobalContext);
+  const { setWeekIndex, showEventModal, snackbarOpen, showLoading, setWeekIndexNew, setDaysMatrix, weekIndexNew, currentMonth, setCurrentMonth, createSuccessOpen, setCreateSuccessOpen, editSuccessOpen, setEditSuccessOpen, deleteSuccessOpen, setDeleteSuccessOpen } = useContext(GlobalContext);
 
   useEffect(() => {
     setCurrentMonth(getWeek(dayjs().month(), weekIndexNew));
@@ -50,6 +50,14 @@ function App() {
     }
 
     setEditSuccessOpen(false);
+  };
+
+  const handleDeleteSuccessClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setDeleteSuccessOpen(false);
   };
 
   return (
@@ -82,6 +90,15 @@ function App() {
         >
            <AlertNew onClose={handleEditSuccessClose} severity="info" sx={{ width: '100%' }}>
             Appointment Updated Successfully
+           </AlertNew>
+        </Snackbar> 
+
+        <Snackbar
+          open={deleteSuccessOpen}
+          autoHideDuration={1000}
+        >
+           <AlertNew onClose={handleDeleteSuccessClose} severity="info" sx={{ width: '100%' }}>
+            Appointment Deleted Successfully
            </AlertNew>
         </Snackbar> 
 

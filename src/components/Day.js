@@ -120,7 +120,7 @@ export default function Day({ day, rowIdx }) {
       const startTimeArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.start_time});
       const endTimeArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.end_time});
       const slotDetailsArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.notes});
-      // const slotIdsArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.id});
+      const slotIdsArr = data.data.attributes.appointments_data.data.map(item => {return item.id});
       const slotUserNameArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.customer_name});
       const slotWorkspaceArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.clinic_name});
       const slotServiceArr = data.data.attributes.appointments_data.data.map(item => {return item.attributes.service});
@@ -131,7 +131,7 @@ export default function Day({ day, rowIdx }) {
       setDocEndTime(endTimeArr);
       setDocSlotDetails(slotDetailsArr);
       setShowLoading(false);
-      // setDocSlotIDs(slotIdsArr);
+      setDocSlotIDs(slotIdsArr);
       setDocSlotUserName(slotUserNameArr);
       setDocSlotWorkspace(slotWorkspaceArr);
       setDocSlotService(slotServiceArr);

@@ -79,6 +79,8 @@ const GlobalContext = React.createContext({
   docSlotUserMobile: [],
   createSuccessOpen: false,
   setCreateSuccessOpen: () => {},
+  deleteSuccessOpen: false,
+  setDeleteSuccessOpen: () => {},
   editSuccessOpen: false,
   setEditSuccessOpen: () => {},
   setStaffUnavailabilityData: (data) => {},

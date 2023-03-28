@@ -8,12 +8,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import ListItemText from '@mui/material/ListItemText';
-import Select from '@mui/material/Select';
-import Checkbox from '@mui/material/Checkbox';
+// import OutlinedInput from '@mui/material/OutlinedInput';
+// import MenuItem from '@mui/material/MenuItem';
+// import FormControl from '@mui/material/FormControl';
+// import ListItemText from '@mui/material/ListItemText';
+// import Select from '@mui/material/Select';
+// import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
@@ -142,7 +142,8 @@ export default function EventModal() {
     setDocSlotUserMobile,
     docSlotUserMobile,
     setCreateSuccessOpen,
-    setEditSuccessOpen
+    setEditSuccessOpen,
+    setDeleteSuccessOpen
   } = useContext(GlobalContext);
 
   console.log('doctors name :', doctorsName, doctorSelected, docSlotService, selectedSlotArrIndex)
@@ -262,62 +263,36 @@ export default function EventModal() {
   };
 
   function editBooking(){
-    let serviceValueObj = [];
-    for(let i=0;i<serviceValue.length;i++){
-      serviceValueObj.push({'service_id' : serviceValue[i]})
-    }
 
-    const userMobile = customerValue.split('(')[1].split(')')[0];
-    const userName = customerValue.split('(')[0];
-
-    const workspaceObj = workspaceList.filter(item => item.name === workspaceValue);
-   // console.log('workspaceObj:', workspaceObj);
-
-    const staffObj = doctorsList.filter(item => item.id === doctorSelected);
-
-    const serviceObj = serviceList.filter(item => {
-      for(let i=0;i<serviceValue.length;i++){
-        if(item.name === serviceValue[i]){
-          return item;
-        }
-      }
-    });
-
-   // console.log('staffObj, serviceObj:', staffObj, serviceObj)
-
-    const editSlotBookDataNew = {
-        "id": docSlotIDs[selectedSlotArrIndex],
+    const editSlotBookDataNew = {"data" : {
         "date": date,
-        "staff_id": doctorSelected,
+        "assigned_staff": doctorSelected,
         "start_time": startTime,
         "end_time": endTime,
-        "user_name": userName,
-        "user_mobile": userMobile,
+        "customer_name": customerValue,
+        "customer_phone": customerPhone,
         "description": title,
-        "workspace_id": workspaceValue,
-        "service_ids": serviceValue,
-        "workspace_obj": workspaceObj,
-        "staff_obj": staffObj,
-        "service_obj": serviceObj
-    };
+        "clinic_name": workspaceValue,
+        "service": serviceValue
+    }};
 
    // console.log('editSlotBookDataNew:', editSlotBookDataNew)
 
-    fetch("https://booking.vetic.in/booking-internal/update", {
-      method: "POST",
+    fetch(`http://localhost:1337/api/doctor-appointments/${docSlotIDs[selectedSlotArrIndex]}`, {
+      method: "PUT",
       headers: {"Content-type": "application/json; charset=UTF-8"},
       body: JSON.stringify(editSlotBookDataNew),
     })
     .then(results => results.json())
     .then(data => {
       docSlotWorkspace[selectedSlotArrIndex] = workspaceValue;
-      docSlotUserMobile[selectedSlotArrIndex] = userMobile;
+      docSlotUserMobile[selectedSlotArrIndex] = customerPhone;
       docStartTime[selectedSlotArrIndex] = startTime;
       docEndTime[selectedSlotArrIndex] = endTime;
       docSlotUserName[selectedSlotArrIndex] = customerValue;
       docSlotDetails[selectedSlotArrIndex] = title;
       docDate[selectedSlotArrIndex] = date;
-      docSlotService[selectedSlotArrIndex] = serviceObj;
+      docSlotService[selectedSlotArrIndex] = serviceValue;
       docSlotIDs[selectedSlotArrIndex] = data.data.id;
    //   console.log('docSlotService:', docSlotService)
       setShowEventModal(false);
@@ -336,7 +311,7 @@ export default function EventModal() {
     const slotUserNameArr = docSlotUserName.filter(item =>  item !== docSlotUserName[selectedSlotArrIndex]);
     const slotWorkspaceArr = docSlotWorkspace.filter(item =>  item !== docSlotWorkspace[selectedSlotArrIndex]);
     const slotDateArr = docDate.filter(item =>  item !== docDate[selectedSlotArrIndex]);
-    fetch(`https://booking.vetic.in/booking/delete?id=${docSlotIDs[selectedSlotArrIndex]}`, {
+    fetch(`http://localhost:1337/api/doctor-appointments/${docSlotIDs[selectedSlotArrIndex]}`, {
       method: "DELETE",
     })
     .then(results => results.json())
@@ -353,6 +328,8 @@ export default function EventModal() {
       setShowEditButton(false);
       setOpenDialog(false);
       setSelectedSlotArrIndex(null);
+      setDeleteSuccessOpen(true);
+      setTimeout(()=> setDeleteSuccessOpen(false), 1000)
     });
   }
 

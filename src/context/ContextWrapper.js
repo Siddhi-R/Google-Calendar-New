@@ -66,6 +66,7 @@ export default function ContextWrapper(props) {
   const [clinicSelectedName, setClinicSelectedName] = useState('');
   const [disableSlots, setDisableSlots] = useState('');
   const [createSuccessOpen, setCreateSuccessOpen] = useState(false);
+  const [deleteSuccessOpen, setDeleteSuccessOpen] = useState(false);
   const [editSuccessOpen, setEditSuccessOpen] = useState(false);
   const [staffAvailabilityData, setStaffAvailabilityData] = useState([]);
   const [staffUnavailabilityData, setStaffUnavailabilityData] = useState([]);
@@ -214,7 +215,9 @@ export default function ContextWrapper(props) {
         setShowSettings,
         showSettings,
         schedulePresent,
-        setSchedulePresent
+        setSchedulePresent,
+        deleteSuccessOpen,
+        setDeleteSuccessOpen
       }}
     >
       {props.children}
