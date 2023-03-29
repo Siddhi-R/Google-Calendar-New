@@ -72,6 +72,8 @@ export default function ContextWrapper(props) {
   const [staffUnavailabilityData, setStaffUnavailabilityData] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
   const [schedulePresent, setSchedulePresent] = useState(false);
+  const [staffAddSuccessOpen, setStaffAddSuccessOpen] = useState(false);
+  const [clinicListAutomcomplete, setClinicListAutocomplete] = useState([]);
   const [savedEvents, dispatchCalEvent] = useReducer(
     savedEventsReducer,
     [],
@@ -217,7 +219,11 @@ export default function ContextWrapper(props) {
         schedulePresent,
         setSchedulePresent,
         deleteSuccessOpen,
-        setDeleteSuccessOpen
+        setDeleteSuccessOpen,
+        clinicListAutomcomplete,
+        setClinicListAutocomplete,
+        staffAddSuccessOpen,
+        setStaffAddSuccessOpen
       }}
     >
       {props.children}

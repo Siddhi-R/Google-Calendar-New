@@ -8,6 +8,12 @@ import Modal from '@mui/material/Modal';
 import styled from 'styled-components';
 import { timeZone } from "../constants/time-constant";
 import SettingsIcon from '@mui/icons-material/Settings';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const style = {
   position: 'absolute',
@@ -91,7 +97,7 @@ const AddButton = styled.button`
 `;
 
 export default function CalendarHeader() {
-  const { monthIndex, setMonthIndex, weekIndexNew, daysMatrixNew, setCurrentMonth, setWeekIndexNew, weekIndex, setDisableSlots, showSettings, doctorSelected, doctorName, daySelected } = useContext(GlobalContext);
+  const { monthIndex, setMonthIndex, weekIndexNew, daysMatrixNew, setCurrentMonth, setWeekIndexNew, weekIndex, setDisableSlots, showSettings, doctorSelected, doctorName, daySelected, clinicListAutomcomplete, setStaffAddSuccessOpen } = useContext(GlobalContext);
 
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
   const [monStartTime, setMonStartTime] = React.useState('');
@@ -122,6 +128,16 @@ export default function CalendarHeader() {
 
   const [openAddCustomerModal, setOpenAddCustomerModal] = React.useState(false);
   const [openAddStaffModal, setOpenAddStaffModal] = React.useState(false);
+  const [staffName, setStaffName] = React.useState('');
+  const [staffEmail, setStaffEmail] = React.useState('');
+  const [staffPhone, setStaffPhone] = React.useState('');
+  const [staffGender, setStaffGender] = React.useState('');
+  const [staffDob, setStaffDob] = React.useState('');
+  const [staffClinicName, setStaffClinicName] = React.useState('');
+  const [staffClinicId, setStaffClinicId] = React.useState(0);
+
+  console.log('clendar header clini list:', clinicListAutomcomplete)
+  const [inputValue, setInputValue] = React.useState('');
 
   const handleOpenSettingsModal = () => {
     setOpenSettingsModal(true);
@@ -265,6 +281,34 @@ export default function CalendarHeader() {
     });
   }
 
+  function createNewStaff(){
+    const staffData = {
+      "data" : 
+      {
+        "doctor_name": staffName,
+        "doctor_email": staffEmail,
+        "doctor_phone": staffPhone,
+        "doctor_dob": staffDob,
+        "doctor_gender": staffGender,
+        "clinic_id": staffClinicId,
+        // "appointments_data": {},
+      }
+    }
+    console.log('inside createNew taff staffData:', staffData)
+    fetch(`http://localhost:1337/api/doctors-list-clinic-wises`, {
+      method: "POST",
+      headers: {"Content-type": "application/json; charset=UTF-8"},
+      body: JSON.stringify(staffData),
+    })
+    .then(results => results.json())
+    .then(data => {
+      setOpenAddStaffModal(false);
+      setStaffAddSuccessOpen(true);
+      console.log('Staff Created Successfully:', data);
+    });
+    
+  }
+
   return (
     <header className="px-4 py-2 flex items-center">
       <img src={logo} alt="calendar" className="mr-2 w-12 h-12" />
@@ -293,7 +337,7 @@ export default function CalendarHeader() {
         )}
       </h2>
       <div  style={{'width': '90%','display': 'flex','justifyContent': 'flex-end'}}>
-        <button style={{marginRight: '20px', fontWeight: '600'}} onClick={() => setOpenAddCustomerModal(true)}>+ Add New Customer</button>
+        {/* <button style={{marginRight: '20px', fontWeight: '600'}} onClick={() => setOpenAddCustomerModal(true)}>+ Add New Customer</button> */}
         <button style={{marginRight: '20px', fontWeight: '600'}} onClick={() => setOpenAddStaffModal(true)}>+ Add New Staff</button>
         {showSettings && 
           <button onClick={handleOpenSettingsModal} >
@@ -532,7 +576,7 @@ export default function CalendarHeader() {
         </Box>
       </Modal>
 
-      <Modal
+      {/* <Modal
         open={openAddCustomerModal}
         onClose={() => setOpenAddCustomerModal(false)}
         aria-labelledby="parent-modal-title"
@@ -595,7 +639,7 @@ export default function CalendarHeader() {
               </SubmitButton>
           </FooterWrapper>
         </Box>
-      </Modal>
+      </Modal> */}
 
       <Modal
         open={openAddStaffModal}
@@ -613,10 +657,10 @@ export default function CalendarHeader() {
               <InputWrapper
                 type="text"
                 name="Staff Name"
-                value=""
+                value={staffName}
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
-                onChange={(e) => {}}
+                onChange={(e) => {setStaffName(e.target.value)}}
               />
 
               <span className="text-gray-600 font-medium">
@@ -624,11 +668,11 @@ export default function CalendarHeader() {
               </span>
               <InputWrapper
                 type="text"
-                name="Staff Name"
-                value=""
+                name="Staff Email"
+                value={staffEmail}
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
-                onChange={(e) => {}}
+                onChange={(e) => {setStaffEmail(e.target.value)}}
               />
 
               <span className="text-gray-600 font-medium">
@@ -636,14 +680,14 @@ export default function CalendarHeader() {
               </span>
               <InputWrapper
                 type="text"
-                name="Staff Name"
-                value=""
+                name="Staff Phone"
+                value={staffPhone}
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
-                onChange={(e) => {}}
+                onChange={(e) => {setStaffPhone(e.target.value)}}
               />
 
-              <span className="text-gray-600 font-medium">
+              {/* <span className="text-gray-600 font-medium">
                 Role
               </span>
               <InputWrapper
@@ -653,7 +697,7 @@ export default function CalendarHeader() {
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
                 onChange={(e) => {}}
-              />
+              /> */}
 
               <span className="text-gray-600 font-medium">
                 Date Of Birth
@@ -661,26 +705,49 @@ export default function CalendarHeader() {
               <DateWrapper
                 type="date"
                 name="title"
-                value=""
+                value={staffDob}
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500" 
-                onChange={(e) => {
+                onChange={(e) => { setStaffDob(e.target.value)
                 }}
               />
 
               <span className="text-gray-600 font-medium">
                 Gender
               </span>
-              <InputWrapper
-                type="text"
-                name="Staff Name"
-                value=""
-                required
-                className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
-                onChange={(e) => {}}
+              <FormControl>
+                <InputLabel id="demo-simple-select-label">Gender</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={staffGender}
+                  label="Age"
+                  onChange={(e) => setStaffGender(e.target.value)}
+                >
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+              <span className="text-gray-600 font-medium">
+                Assigned Clinic
+              </span>
+              <Autocomplete
+                value={staffClinicName}
+                onChange={(event, newValue) => {
+                  setStaffClinicId(newValue.id)
+                  setStaffClinicName(newValue.label)
+                }}
+                inputValue={inputValue}
+                onInputChange={(event, newInputValue) => {
+                  setInputValue(newInputValue);
+                }}
+                id="controllable-states-demo"
+                options={clinicListAutomcomplete}
+                renderInput={(params) => <TextField {...params} label="Clinic List" />}
               />
 
-              <span className="text-gray-600 font-medium">
+              {/* <span className="text-gray-600 font-medium">
                 Assigned Services
               </span>
               <InputWrapper
@@ -690,7 +757,7 @@ export default function CalendarHeader() {
                 required
                 className="pt-3 font-medium pb-2 w-full border-gray-200 focus:outline-none focus:ring-0 focus:border-blue-500"
                 onChange={(e) => {}}
-              />  
+              />   */}
             </div>
           </InputDivWrapper>
           <FooterWrapper className='flex grid-cols-2'>  
@@ -702,7 +769,7 @@ export default function CalendarHeader() {
               </CancelButton>
               <SubmitButton
               type="submit"
-              onClick={() => console.log('onSaveClick Add Staff')}
+              onClick={createNewStaff}
               className="bg-blue-500 "
               >
                Save

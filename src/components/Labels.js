@@ -5,8 +5,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 export default function Labels() {
 
-  const {  setShowLoading, clinicList, setClinicList, setClinicSelected, setClinicSelectedName } = useContext(GlobalContext);
-  const [clinicListAutomcomplete, setClinicListAutocomplete] = useState([]);
+  const {  setShowLoading, clinicList, setClinicList, setClinicSelected, setClinicSelectedName, clinicListAutomcomplete, setClinicListAutocomplete } = useContext(GlobalContext);
+  // const [clinicListAutomcomplete, setClinicListAutocomplete] = useState([]);
   const [value, setValue] = React.useState('');
   const [inputValue, setInputValue] = React.useState('');
 

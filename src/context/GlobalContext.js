@@ -91,6 +91,10 @@ const GlobalContext = React.createContext({
   showSettings: () => {},
   setSchedulePresent: false,
   showSchedulePresent: () => {},
+  clinicListAutocomplete : [],
+  setClinicListAutocomplete : () => {},
+  staffAddSuccessOpen : false,
+  setStaffAddSuccessOpen: () => {}
 });
 
 export default GlobalContext;

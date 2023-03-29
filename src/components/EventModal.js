@@ -173,6 +173,7 @@ export default function EventModal() {
   const titleSelected = selectedSlotArrIndex !== null ? docSlotDetails[selectedSlotArrIndex] :'';
   const dateSelected = selectedSlotArrIndex !== null ? docDate[selectedSlotArrIndex] : daySelected.format('YYYY-MM-DD');
   const serviceSelected = selectedSlotArrIndex !== null ? docSlotService[selectedSlotArrIndex] : '';
+  console.log('service selected:', serviceSelected)
   const [customerValue, setCustomerValue] = React.useState(customerValSelected);
   const [customerPhone, setCustomerPhone] = React.useState(customerPhoneSelected);
   const [serviceValue, setServiceValue] = React.useState(serviceSelected);

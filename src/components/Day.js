@@ -54,7 +54,6 @@ const CapsuleTextWrapper = styled.p`
 `;
 
 export default function Day({ day, rowIdx }) {
- // console.log('day.js day value:', day.format('dddd').toLowerCase())
   const {
     setDaySelected,
     setTimeSelected,
@@ -103,6 +102,8 @@ export default function Day({ day, rowIdx }) {
       // setShowSettings(true);
     }
   }, [doctorSelected]);
+
+  console.log('day.js disableSlots value:', disableSlots)
 
   function bookingList(){
     fetch(`http://localhost:1337/api/doctors-list-clinic-wises/${doctorSelected}?populate=*`, {
@@ -241,20 +242,20 @@ export default function Day({ day, rowIdx }) {
           </DateDivWrapper>
           {timeZone.map(({time, id, start_time, end_time}, index) => 
             <TimeZoneBoxWrapper  key={index}  
-              // style={{"backgroundColor" : disableSlots || (schedulePresent  && (doctorSelected && startTimeCondition(start_time) || endTimeCondition(start_time))) ? "#F0F0F0" : '', "cursor": disableSlots || (schedulePresent  && (doctorSelected && startTimeCondition(start_time) || endTimeCondition(start_time))) ? "not-allowed" : ''}}
+              style={{"backgroundColor" : disableSlots  ? "#F0F0F0" : '', "cursor": disableSlots ? "not-allowed" : ''}}
               onClick={(e) => {
-                //   if(disableSlots || (schedulePresent && (doctorSelected && startTimeCondition(start_time) || endTimeCondition(start_time)))){
+                if(disableSlots){
                 //  // console.log('check if key exists :', staffScheduleData.hasOwnProperty('monday_start_time'))
-                //   e.stopPropagation();
-                //   e.preventDefault();
-                // }else{
+                e.stopPropagation();
+                e.preventDefault();
+                }else{
                   console.log('staffSchedule on clicj:', staffScheduleData)
                   setDaySelected(day);
                   setTimeSelected(index);
                   setShowEventModal(true);
                   setRowIdx(rowIdx);
                   setIndex(index);
-                // }
+                }
               }}
               >
                 {docDate && docDate.map((item,id) => item === day.format('YYYY-MM-DD') && docStartTime[id] >= start_time && docEndTime[id] <= end_time && 
