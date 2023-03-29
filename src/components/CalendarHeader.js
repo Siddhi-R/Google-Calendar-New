@@ -304,6 +304,9 @@ export default function CalendarHeader() {
     .then(data => {
       setOpenAddStaffModal(false);
       setStaffAddSuccessOpen(true);
+      setTimeout(() => {
+        setStaffAddSuccessOpen(false);
+      }, 1000)
       console.log('Staff Created Successfully:', data);
     });
     
